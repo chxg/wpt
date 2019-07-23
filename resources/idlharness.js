@@ -245,6 +245,16 @@ IdlArray.prototype.add_dependency_idls = function(raw_idls, options)
         this.includes[k].forEach(v => all_deps.add(v));
     });
     this.partials.map(p => p.name).forEach(v => all_deps.add(v));
+    // Add 'TypeOfType' for each "typedef TypeOfType MyType;" entry.
+    Object.entries(this.members).forEach(([k, v]) => {
+        if (v instanceof IdlTypedef) {
+            let defs = v.idlType.union
+                ? v.idlType.idlType.map(t => t.idlType)
+                : [v.idlType.idlType];
+            defs.forEach(d => all_deps.add(d));
+        }
+    });
+    
     // Add the attribute idlTypes of all the nested members of all tested idls.
     for (const obj of [this.members, this.partials]) {
         const tested = Object.values(obj).filter(m => !m.untested && m.members);
@@ -1107,6 +1117,18 @@ IdlArray.prototype.assert_type_is = function(value, type)
 
         case "object":
             assert_in_array(typeof value, ["object", "function"], "wrong type: not object or function");
+            return;
+            
+        case "Int8Array":
+        case "Int16Array":
+        case "Int32Array":
+        case "Uint8Array":
+        case "Uint16Array":
+        case "Uint32Array":
+        case "Uint8ClampedArray":
+        case "Float32Array":
+        case "Float64Array":
+            assert_equals(typeof value, "object");
             return;
     }
 
