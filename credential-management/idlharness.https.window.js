@@ -11,22 +11,26 @@ idl_test(
   idl_array => {
     idl_array.add_objects({
       CredentialsContainer: ['navigator.credentials'],
-      PasswordCredential: [
-        `new PasswordCredential({
-          id: "id",
-          password: "pencil",
-          iconURL: "https://example.com/",
-          name: "name"
-        })`
-      ],
-      FederatedCredential: [
-        `new FederatedCredential({
-          id: "id",
-          provider: "https://example.com",
-          iconURL: "https://example.com/",
-          name: "name"
-        })`
-      ]
+      PasswordCredential: ['passwordCredential'],
+      FederatedCredential: ['federatedCredential'],
     });
+
+    try {
+      self.passwordCredential = new PasswordCredential({
+        id: "id",
+        password: "pencil",
+        iconURL: "https://example.com/",
+        name: "name"
+      });
+    } catch (e) {}
+
+    try {
+      self.federatedCredential = new FederatedCredential({
+        id: "id",
+        provider: "https://example.com",
+        iconURL: "https://example.com/",
+        name: "name"
+      });
+    } catch (e) {}
   }
 )
